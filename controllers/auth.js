@@ -29,10 +29,13 @@ const register = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: "User Already Exist!" });
     }
+    //let pass = req.body.password; //assigning a password in a variable
+    //console.log("hash password before:",pass); //revewing in console
 
     // Generate Hashed Password using the hashPassword function
     let hashedPassword = await hashPassword(req.body.password);
-
+    // console.log("hash password after:",hashedPassword);//after hashed
+    
     // Generate an activation token
     const activationToken = generateActivationToken();
 
