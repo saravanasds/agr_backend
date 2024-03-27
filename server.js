@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { dataBaseConnection } from "./config/database.js";
-// import { indexRoutes } from "./routes/index.js";
+import { indexRoutes } from "./routes/index.js";
 
 //Configuring the environmental variable
 dotenv.config();
@@ -25,8 +25,8 @@ app.get("/", async (req, res) => {
     .send("This is AGR App Backend");
 });
 
-// //Routes
-// app.use("/api", indexRoutes);
+//Routes
+app.use("/api", indexRoutes);
 
 //Listening the Server
 app.listen(PORT, () => {
