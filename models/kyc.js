@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const kycSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true,
+    // required: true,
   },
   name: {
     type: String,
@@ -85,6 +85,12 @@ const kycSchema = new mongoose.Schema({
   referralId: {
     type: String,
   },
+  amount: {
+    type: Number,
+  },
+  paymentScreenshot: {
+    type: String,
+  }
 });
 
 const Kyc = mongoose.model("Kyc", kycSchema);
