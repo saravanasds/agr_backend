@@ -48,7 +48,7 @@ const register = async (req, res) => {
     const activationLink = `${process.env.BASE_URL}/activate/${activationToken}`;
     // HTML content for the activation email
     const htmlContent = `
-        <p>Hello ${user.firstName},</p>
+        <p>Hello ${user.name},</p>
         <p>Thank you for registering with AGR Group of Company. To activate your account, click the button below:</p>
         <a href="${activationLink}">
         <button style="padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -116,7 +116,7 @@ const login = async (req, res) => {
 
     // Generate and send an authentication token
     const token = sendToken(user);
-    const userName = user.firstName;
+    const userName = user.name;
     // Respond with a success message and the token
     res.status(200).json({ message: "Login successful", token, userName });
   } catch (error) {
@@ -147,7 +147,7 @@ const forgotPassword = async (req, res, next) => {
 
     // HTML content for the email
     const htmlContent = `
-        <p>Hello ${user.firstName},</p>
+        <p>Hello ${user.name},</p>
         <p>You have requested to reset your password. Click the button below to reset it:</p>
         <a href="${resetLink}">
           <button style="padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
