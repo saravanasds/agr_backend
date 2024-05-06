@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const kycSchema = new mongoose.Schema({
   email: {
     type: String,
-    // required: true,
+    required: true,
   },
   name: {
     type: String,
