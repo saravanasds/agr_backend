@@ -21,3 +21,4 @@ router.put("/resetpassword/:randomString", resetpassword);
 router.get("/private", protectRoute, getPrivateData);
 
 export const authRouter = router;
+
