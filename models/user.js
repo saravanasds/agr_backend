@@ -39,15 +39,15 @@ const userSchema = new mongoose.Schema({
   alternateMobileNumber: {
     type: String,
   },
-  adharno: {
+  aadharNo: {
     type: String,
     required: true,
   },
   adharproof: {
-    type: String,
+    type: Object,
   },
   photo: {
-    type: String,
+    type: Object,
   },
   nomineeName: {
     type: String,
@@ -86,16 +86,13 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   paymentScreenshot: {
-    type: String,
+    type: Object,
   },
   referralId: {
     type: String,
   },
   amount: {
     type: Number,
-  },
-  paymentScreenshot: {
-    type: String,
   },
   activationToken: {
     type: String,
