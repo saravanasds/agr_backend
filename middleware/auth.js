@@ -1,5 +1,10 @@
 import jwt from "jsonwebtoken";
 import CustomError from "../utils/error.js";
+import multer from "multer";
+
+// Error handling middleware for Multer
+const upload = multer();
+upload.any(); // This will catch Multer errors
 
 export const protectRoute = (req, res, next) => {
   const token = req.header("Authorization");
@@ -16,5 +21,18 @@ export const protectRoute = (req, res, next) => {
     next();
   } catch (error) {
     throw new CustomError("Access denied. Invalid token.", 401);
+  }
+};
+
+// Error handling middleware
+export const errorHandler = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Multer error occurred
+    console.error("Multer error:", err);
+    res.status(400).send("Multer error: " + err.message);
+  } else {
+    // Other errors
+    console.error("Error:", err);
+    res.status(500).send("Internal server error");
   }
 };

@@ -16,7 +16,7 @@ const router = express.Router();
 // Multer configuration for file upload
 const upload = multer({ dest: "uploads/" }); // Adjust destination directory as needed
 
-router.post("/register", upload.fields([
+router.post("/register", register, upload.fields([
   { name: "adharProof", maxCount: 1 },
   { name: "paymentScreenshot", maxCount: 1 },
   { name: "photo", maxCount: 1 }
