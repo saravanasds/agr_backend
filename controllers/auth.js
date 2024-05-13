@@ -12,6 +12,7 @@ import {
   getUserByEmail,
   getUserByRandomString,
 } from "../utils/user.js";
+import { request } from "express";
 
 const getPrivateData = (req, res) => {
   console.log(req.user);
@@ -22,7 +23,21 @@ const getPrivateData = (req, res) => {
   });
 };
 
+const userExist = async (req, res) => {
+  try {
+    let user = await getUserByEmail(req);
+    if (user) {
+      return res.status(400).json({ error: "User Already Exist!" });
+    }else {
+      return res.status(200).json({message: "This is new user"})
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server" });
+  }
+};
+
 const register = async (req, res) => {
+  // console.log(req.files, req.body);
   try {
     // Check if the user already exists
     let user = await getUserByEmail(req);
@@ -35,7 +50,7 @@ const register = async (req, res) => {
     // Generate Hashed Password using the hashPassword function
     let hashedPassword = await hashPassword(req.body.password);
     // console.log("hash password after:",hashedPassword);//after hashed
-    
+
     // Generate an activation token
     const activationToken = generateActivationToken();
 
@@ -43,7 +58,12 @@ const register = async (req, res) => {
       ...req.body,
       password: hashedPassword,
       activationToken, // Store the activation token in the user document
+      adharProof: req.files.adharProof[0].path,
+      photo: req.files.photo[0].path,
+      paymentScreenshot: req.files.paymentScreenshot[0].path,
     }).save();
+
+    console.log("user : 53 :", user);
 
     const activationLink = `${process.env.BASE_URL}/activate/${activationToken}`;
     // HTML content for the activation email
@@ -65,7 +85,7 @@ const register = async (req, res) => {
       activationToken: activationToken,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Error : ", error);
     res.status(500).json({ error: "Internal Server" });
   }
 };
@@ -224,6 +244,7 @@ const resetpassword = async (req, res, next) => {
 
 export {
   getPrivateData,
+  userExist,
   register,
   login,
   forgotPassword,

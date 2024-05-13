@@ -13,7 +13,10 @@ const PORT = process.env.PORT || 9000;
 
 //Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
+app.use("/uploads", express.static("uploads"));
 
 //Database Connection
 dataBaseConnection();

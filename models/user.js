@@ -44,12 +44,14 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   adharProof: {
-    data: Buffer, // Changed to Buffer data type
-    contentType: String, // Added contentType to store MIME type
+    type: String,
+    // data: Buffer, // Changed to Buffer data type
+    // contentType: String, // Added contentType to store MIME type
   },
   photo: {
-    data: Buffer, // Changed to Buffer data type
-    contentType: String, // Added contentType to store MIME type
+    type: String,
+    // data: Buffer, // Changed to Buffer data type
+    // contentType: String, // Added contentType to store MIME type
   },
   nomineeName: {
     type: String,
@@ -88,8 +90,9 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   paymentScreenshot: {
-    data: Buffer, // Changed to Buffer data type
-    contentType: String, // Added contentType to store MIME type
+    type : String,
+    // data: Buffer, // Changed to Buffer data type
+    // contentType: String, // Added contentType to store MIME type
   },
   referralId: {
     type: String,
