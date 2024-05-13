@@ -28,8 +28,8 @@ const userExist = async (req, res) => {
     let user = await getUserByEmail(req);
     if (user) {
       return res.status(400).json({ error: "User Already Exist!" });
-    }else {
-      return res.status(200).json({message: "This is new user"})
+    } else {
+      return res.status(200).json({ message: "This is new user" });
     }
   } catch (error) {
     res.status(500).json({ error: "Internal Server" });
@@ -89,23 +89,40 @@ const register = async (req, res) => {
     res.status(500).json({ error: "Internal Server" });
   }
 };
-
 const activateUser = async (req, res) => {
+  try {
+    const user = await getUserByEmail(req);
+
+    if(!user){
+      return res.status(400).json({error: "user not found..."})
+    }
+
+    user.isActivate = req.body.reqMessage
+    await user.save();
+
+    return res.status(200).json({message : `${user.isActivate ? "Account activated successfully": "Account deactivated successfully"}`})
+
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server" });
+  }
+};
+
+const activateUserEmail = async (req, res) => {
   try {
     // Find the user with the given activation token
     const user = await getUserByActivationToken(req);
-    console.log(user);
+    // console.log(user);
     if (!user) {
       return res.status(400).json({ error: "Invalid activation token!" });
     }
 
     // Update the user's status to indicate activation
-    user.isActive = true;
+    user.isEmailVerified = true;
     user.activationToken = undefined; // Clear the activation token
     await user.save();
 
     res.status(200).json({
-      message: "Account activated successfully",
+      message: "Email verified successfully",
     });
   } catch (error) {
     console.log(error);
@@ -122,6 +139,10 @@ const login = async (req, res) => {
       return res
         .status(404)
         .json({ error: "User not found. Please register!" });
+    }
+
+    if(user.isActivate === false){
+      return res.status(400).json({error : "Your account not activated..."})
     }
 
     // Verify the user's password
@@ -242,6 +263,20 @@ const resetpassword = async (req, res, next) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    // const response = await User.deleteOne({
+    //   email: req.body.email,
+    // });
+    if (response?.deletedCount === 0) {
+      return res.status(401).send("User not found...");
+    }
+    return res.status(200).json({ message: "user deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export {
   getPrivateData,
   userExist,
@@ -250,5 +285,7 @@ export {
   forgotPassword,
   verifyRandomString,
   resetpassword,
+  activateUserEmail,
+  deleteUser,
   activateUser,
 };

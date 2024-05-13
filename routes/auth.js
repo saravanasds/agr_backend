@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  activateUser,
+  activateUserEmail,
   forgotPassword,
   login,
   userExist,
@@ -8,6 +8,8 @@ import {
   resetpassword,
   verifyRandomString,
   getPrivateData,
+  deleteUser,
+  activateUser,
 } from "../controllers/auth.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
@@ -39,11 +41,13 @@ router.post(
   register,
 );
 
-router.get("/activate/:activationToken", activateUser);
+router.get("/activate/:activationToken", activateUserEmail);
 router.post("/login", login);
 router.post("/forgotpassword", forgotPassword);
 router.get("/verifyRandomString/:randomString", verifyRandomString);
 router.put("/resetpassword/:randomString", resetpassword);
 router.get("/private", protectRoute, getPrivateData);
+router.post("/deleteUser", deleteUser);
+router.post("/activateUser", activateUser);
 
 export const authRouter = router;

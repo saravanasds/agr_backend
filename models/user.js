@@ -103,7 +103,11 @@ const userSchema = new mongoose.Schema({
   activationToken: {
     type: String,
   },
-  isActive: {
+  isEmailVerified: {
+    type : Boolean,
+    default: false,
+  },
+  isActivate: {
     type: Boolean,
     default: false,
   },

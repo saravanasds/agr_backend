@@ -22,7 +22,8 @@ function generateToken(user) {
 // Function to verify and decode a JWT token
 function verifyToken(token) {
   try {
-    const decoded = jwt.verify(token, secretKey);
+    // const decoded = jwt.verify(token, secretKey);
+    const decoded = jwt.verify(token, JWT_SECRET_KEY);
     return decoded;
   } catch (error) {
     return null;
