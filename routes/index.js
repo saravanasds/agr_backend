@@ -1,10 +1,10 @@
 import express from "express";
 import { authRouter } from "./auth.js";
-import { kycRouter } from "./kyc.js";
+import { adminRouter } from "./admin.js";
 
 const router = express.Router();
 
 router.use("/auth", authRouter);
-router.use("/kyc", kycRouter);
+router.use("/admin", adminRouter);
 
 export const indexRoutes = router;

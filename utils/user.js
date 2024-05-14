@@ -8,7 +8,7 @@ export function getUserByEmail(request) {
 
 export function getUserByActivationToken(request) {
   return User.findOne({
-    activationToken: request.params.activationToken,
+    activationToken: request.body.activationToken,
   });
 }
 
