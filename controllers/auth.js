@@ -11,6 +11,7 @@ import {
   getUserByActivationToken,
   getUserByEmail,
   getUserByRandomString,
+  generateReferralId,
 } from "../utils/user.js";
 import { request } from "express";
 
@@ -54,6 +55,8 @@ const register = async (req, res) => {
     // Generate an activation token
     const activationToken = generateActivationToken();
 
+    const referralId = generateReferralId();
+
     user = await new User({
       ...req.body,
       password: hashedPassword,
@@ -61,6 +64,7 @@ const register = async (req, res) => {
       adharProof: req.files.adharProof[0].path,
       photo: req.files.photo[0].path,
       paymentScreenshot: req.files.paymentScreenshot[0].path,
+      referralId,
     }).save();
 
     // console.log("user : 53 :", user);

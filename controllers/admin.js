@@ -27,6 +27,45 @@ const activateUser = async (req, res) => {
   }
 };
 
+const allUsers = async (req, res)=>{
+  try {
+      const allUser = await User.find({});
+      if (!allUser) {
+        return res.status(401).json({ message: "Users not available..." });
+      }
+
+      return res.status(200).json({ data: allUser });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error...", error });    
+  }
+}
+
+const activatedUser = async (req, res) => {
+  try{
+    const activeUsers = await User.find({ isActivate: true });
+    if(!activeUsers){return res.status(400).json({message: "activated user not available..."})}
+
+    return res.status(200).json({activatedUsers : activeUsers})
+  }catch(error){
+    res.status(500).json({message: "Internal server error...", error})
+  }
+}
+
+const deactivatedUser = async (req, res) => {
+  try {
+    const activeUsers = await User.find({ isActivate: false });
+    if (!activeUsers) {
+      return res
+        .status(400)
+        .json({ message: "activated user not available..." });
+    }
+
+    return res.status(200).json({ activatedUsers: activeUsers });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error...", error });
+  }
+};
+
 const deleteUser = async (req, res) => {
   try {
     const response = await User.deleteOne({
@@ -39,6 +78,6 @@ const deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
-}; 
+};
 
-export { activateUser, deleteUser };
+export { activateUser, deleteUser, activatedUser, deactivatedUser, allUsers };

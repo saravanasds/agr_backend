@@ -90,7 +90,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   paymentScreenshot: {
-    type : String,
+    type: String,
     // data: Buffer, // Changed to Buffer data type
     // contentType: String, // Added contentType to store MIME type
   },
@@ -104,7 +104,7 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   isEmailVerified: {
-    type : Boolean,
+    type: Boolean,
     default: false,
   },
   isActivate: {
@@ -113,6 +113,7 @@ const userSchema = new mongoose.Schema({
   },
   randomString: String,
   randomStringExpires: Date,
+  referralId: { type: String, unique: true },
 });
 
 const User = mongoose.model("user", userSchema);

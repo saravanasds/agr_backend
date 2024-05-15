@@ -40,7 +40,7 @@ router.post(
 );
 
 // router.get("/activate/:activationToken", activateUserEmail);
-router.post("/activate", activateUserEmail);
+router.post("/activate/activateUserEmail", activateUserEmail);
 router.post("/login", login);
 router.post("/forgotpassword", forgotPassword);
 router.get("/verifyRandomString/:randomString", verifyRandomString);
