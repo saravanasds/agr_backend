@@ -114,6 +114,10 @@ const userSchema = new mongoose.Schema({
   randomString: String,
   randomStringExpires: Date,
   referralId: { type: String, unique: true },
+  role: {
+    type: String,
+    default: "user"
+  }
 });
 
 const User = mongoose.model("user", userSchema);
