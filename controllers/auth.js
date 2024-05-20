@@ -14,6 +14,7 @@ import {
   generateReferralId,
 } from "../utils/user.js";
 import { request } from "express";
+import { Admin } from "../models/admin.js";
 
 const getPrivateData = (req, res) => {
   console.log(req.user);
@@ -96,30 +97,26 @@ const register = async (req, res) => {
 
 const activateUserEmail = async (req, res) => {
   try {
-    // Find the user with the given activation token
     const user = await getUserByActivationToken(req);
-    console.log("controllers/auth.js 116 :",user);
+    console.log("controllers/auth.js 116 :", user);
     if (!user) {
       return res.status(400).json({ error: "Invalid activation token!" });
     }
 
-    // Update the user's status to indicate activation
     user.isEmailVerified = true;
-    user.activationToken = undefined; // Clear the activation token
+    user.activationToken = undefined;
     await user.save();
 
     res.status(200).json({
       message: "Email verified successfully",
     });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({ message: "Internal Server", error });
   }
 };
 
 const login = async (req, res) => {
   try {
-    // Check if the user exists
     let user = await getUserByEmail(req);
 
     if (!user) {
@@ -128,8 +125,8 @@ const login = async (req, res) => {
         .json({ error: "User not found. Please register!" });
     }
 
-    if(user.isActivate === false){
-      return res.status(400).json({error : "Your account not activated..."})
+    if (user.isActivate === false) {
+      return res.status(400).json({ error: "Your account not activated..." });
     }
 
     // Verify the user's password
@@ -146,7 +143,7 @@ const login = async (req, res) => {
     const token = sendToken(user);
     const userName = user.firstName;
     // Respond with a success message and the token
-    res.status(200).json({ message: "Login successful", token, userName });
+    res.status(200).json({ message: "Login successful", token, data: user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server" });
@@ -249,8 +246,6 @@ const resetpassword = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
 
 export {
   getPrivateData,

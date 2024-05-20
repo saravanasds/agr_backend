@@ -7,8 +7,6 @@ import jwt from "jsonwebtoken";
 
 const register = async (req, res) => {
   try {
-    const registerData = req.body;
-    console.log(registerData);
     let admin = await Admin.findOne({
       email: req.body.email,
     });
@@ -19,7 +17,7 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(req.body.password);
-    console.log(hashedPassword);
+    // console.log(hashedPassword);
     admin = await new Admin({
       ...req.body,
       password: hashedPassword,
@@ -35,7 +33,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    console.log(req.body.email);
+    // console.log(req.body.email);
     let admin = await Admin.findOne({
       email: req.body.email,
     });
