@@ -9,6 +9,7 @@ import {
   verifyRandomString,
   getPrivateData,
 } from "../controllers/auth.js";
+import { withdrawRequest} from "../controllers/user.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
 
@@ -40,11 +41,12 @@ router.post(
 );
 
 // router.get("/activate/:activationToken", activateUserEmail);
-router.post("/activate/activateUserEmail", activateUserEmail);
+router.post("/activate", activateUserEmail);
 router.post("/login", login);
 router.post("/forgotpassword", forgotPassword);
 router.get("/verifyRandomString/:randomString", verifyRandomString);
 router.put("/resetpassword/:randomString", resetpassword);
 router.get("/private", protectRoute, getPrivateData);
+router.post("/withdrawRequest", protectRoute, withdrawRequest);
 
 export const authRouter = router;

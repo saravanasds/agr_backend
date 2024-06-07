@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Counter } from "./counter.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -99,9 +100,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    referredBy: { type: Array },
+    referredPeoples: { type: Array },
+    referredBy: {
+      type: String,
+    },
     amount: {
       type: Number,
+      default: 0,
+    },
+    levelAmount: {
+      type: Number,
+      default: 0,
+    },
+    referralAmount: {
+      type: Number,
+      default: 0,
     },
     activationToken: {
       type: String,
@@ -120,11 +133,81 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
+    id: {
+      type: Number,
+      unique: true,
+    },
+    level: {
+      type: Number,
+    },
+    allParent: {
+      type: Array,
+    },
+    nestedParent : {
+      type : String,
+    },
+    child: {
+      type: Array,
+    },
+    allChild : {
+      type : Array,
+    },
+    totalEarning: {
+      type: Number,
+    },
+    walletBalance: {
+      type: Number,
+    },
+    withdrawAmount: {
+      type: Number,
+    },
+    withdrawHistory: {
+      date: {
+        type: Date,
+      },
+      withdrawAmount: {
+        type: Number,
+      },
+      transactionNo: {
+        type: String,
+      },
+      status: {
+        type: String,
+      },
+      withdrawBankAccountNo: {
+        type: String,
+      },
+      withdrawBankAccountName: {
+        type: String,
+      },
+      withdrawIfsc: {
+        type: String,
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.pre("save", async function (next) {
+  let doc = this;
+  if (doc.isNew) {
+    try {
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: "id" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      doc.id = counter.seq;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next();
+  }
+});
 
 const User = mongoose.model("user", userSchema);
 

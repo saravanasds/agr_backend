@@ -7,4 +7,5 @@ const router = express.Router();
 router.use("/auth", authRouter);
 router.use("/admin", adminRouter);
 
+
 export const indexRoutes = router;

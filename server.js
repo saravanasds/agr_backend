@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { dataBaseConnection } from "./config/database.js";
 import { indexRoutes } from "./routes/index.js";
+import { initializeCounter } from "./config/initializeCounter.js";
 
 //Configuring the environmental variable
 dotenv.config();
@@ -20,6 +21,8 @@ app.use("/uploads", express.static("uploads"));
 
 //Database Connection
 dataBaseConnection();
+
+await initializeCounter();
 
 //Test Route
 app.get("/", async (req, res) => {

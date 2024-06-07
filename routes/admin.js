@@ -7,6 +7,7 @@ import {
   activatedUser,
   deactivatedUser,
   allUsers,
+  withdrawRequestUser,
 } from "../controllers/admin.js";
 import { protectRoute } from "../middleware/auth.js";
 
@@ -18,5 +19,6 @@ router.post("/deleteUser",protectRoute, deleteUser);
 router.post("/activatedUser",protectRoute, activatedUser);
 router.post("/deactivatedUser",protectRoute, deactivatedUser);
 router.post("/allUsers",protectRoute, allUsers);
+router.post("/withdrawRequestUser", protectRoute, withdrawRequestUser);
 
 export const adminRouter = router;

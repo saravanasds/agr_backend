@@ -29,3 +29,8 @@ export function generateReferralId() {
   }
   return activationToken;
 }
+
+export function getUsersOrderedByLevel() {
+  // return User.find({ level: 1 }).sort({ level: 1 }); // 1 for ascending order
+  return User.find({ level: 1});
+}

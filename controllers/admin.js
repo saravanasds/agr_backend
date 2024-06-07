@@ -4,6 +4,7 @@ import { User } from "../models/user.js";
 import { Admin } from "../models/admin.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import jwt from "jsonwebtoken";
+import { WithdrawRequest } from "../models/withdraw.js";
 
 const register = async (req, res) => {
   try {
@@ -151,6 +152,17 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const withdrawRequestUser = async (req, res) => {
+  try{
+    const withdrawUsers = await WithdrawRequest.find({});
+
+    res.status(200).json({ result: withdrawUsers });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error });
+
+  }
+}
+
 export {
   register,
   login,
@@ -159,4 +171,5 @@ export {
   activatedUser,
   deactivatedUser,
   allUsers,
+  withdrawRequestUser,
 };

@@ -12,6 +12,7 @@ import {
   getUserByEmail,
   getUserByRandomString,
   generateReferralId,
+  getUsersOrderedByLevel,
 } from "../utils/user.js";
 import { request } from "express";
 import { Admin } from "../models/admin.js";
@@ -39,39 +40,179 @@ const userExist = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  // console.log(req.files, req.body);
   try {
-    // Check if the user already exists
+    // const userData = req.body;
+    // console.log(userData)
+    // console.log(req.files)
+
     let user = await getUserByEmail(req);
     if (user) {
       return res.status(400).json({ error: "User Already Exist!" });
     }
-    //let pass = req.body.password; //assigning a password in a variable
-    //console.log("hash password before:",pass); //revewing in console
 
-    // Generate Hashed Password using the hashPassword function
+    const allUsers = await User.find({});
+
     let hashedPassword = await hashPassword(req.body.password);
-    // console.log("hash password after:",hashedPassword);//after hashed
 
-    // Generate an activation token
     const activationToken = generateActivationToken();
 
     const referralId = generateReferralId();
+    let allParent = [];
+
+    if (
+      !req.files ||
+      !req.files.adharProof ||
+      !req.files.photo ||
+      !req.files.paymentScreenshot
+    ) {
+      return res
+        .status(400)
+        .json({ error: "All required files must be uploaded" });
+    }
+
+    if (
+      req.files.adharProof.length === 0 ||
+      req.files.photo.length === 0 ||
+      req.files.paymentScreenshot.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ error: "All required files must be uploaded" });
+    }
+    let referredBy = req.body.referredBy;
+    const referralUser = await User.findOne({
+      referralId: req.body.referredBy,
+    });
+
+    if (!referralUser) {
+      referredBy = "";
+    }
 
     user = await new User({
       ...req.body,
+      level: 1,
       password: hashedPassword,
-      activationToken, // Store the activation token in the user document
+      activationToken,
       adharProof: req.files.adharProof[0].path,
       photo: req.files.photo[0].path,
       paymentScreenshot: req.files.paymentScreenshot[0].path,
       referralId,
-    }).save();
+      referredBy,
+    });
 
-    // console.log("user : 53 :", user);
+    // **************************************************
+
+    let currentParentReferralId = "";
+    let allParents = [];
+
+    for (const userData of allUsers) {
+      if (userData.level === 1 && userData.child.length < 3) {
+        userData.child.push(referralId);
+
+        // 1 level referral income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+
+        currentParentReferralId = userData.referralId;
+        allParent = [...userData.allParent, userData.referralId];
+        user.nestedParent = userData.referralId;
+        allParents = userData.allParent;
+        await user.save();
+
+        userData.allChild.push(user.referralId);
+
+        if (userData.child.length === 3) {
+          userData.level = 2;
+        }
+
+        await userData.save();
+        break;
+      }
+
+    }
+
+    user.allParent = allParent;
+    await user.save();
+
+    for (const userData of allUsers) {
+      // console.log("127 :", userData.referralId, referredBy, userData.referralId === referredBy);
+      if (userData.referralId === referredBy) {
+        userData.referredPeoples.push(user.referralId);
+        userData.amount += 500;
+        userData.referralAmount += 500;
+      }
+
+      if (allParent.includes(userData.referralId)) {
+        if (currentParentReferralId != userData.referralId) {
+          userData.amount += 100;
+          userData.levelAmount += 100;
+        }
+        // await userData.save();
+        // break;
+      }
+      if (allParents.includes(userData.referralId)) {
+        userData.allChild.push(user.referralId);
+      }
+      // if(userData.level === 2 && userData.allChild.length > 3 && userData.allChild.length < 12){
+      //   userData.level = 3;
+      //   // 2 level income
+      //   userData.amount += 500;
+      //   userData.levelAmount += 500;
+      // }
+      if(userData.level === 2 && userData.allChild.length >= 12 && userData.allChild.length < 39){
+        userData.level = 3;
+        // 3 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 3 && userData.allChild.length >= 39 && userData.allChild.length < 120){
+        userData.level = 4;
+        // 3 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 4 && userData.allChild.length >= 120 && userData.allChild.length < 363){
+        userData.level = 5;
+        // 4 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 5 && userData.allChild.length >= 363 && userData.allChild.length < 1092){
+        userData.level = 6;
+        // 5 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 6 && userData.allChild.length >= 1092 && userData.allChild.length < 3279){
+        userData.level = 7;
+        // 6 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 7 && userData.allChild.length >= 3279 && userData.allChild.length < 9840){
+        userData.level = 8;
+        // 7 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 8 && userData.allChild.length >= 9840 && userData.allChild.length < 29523){
+        userData.level = 9;
+        // 2 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      if(userData.level === 9 && userData.allChild.length >= 29523 && userData.allChild.length < 88572){
+        userData.level = 10;
+        // 2 level income
+        userData.amount += 500;
+        userData.levelAmount += 500;
+      }
+      await userData.save();
+    }
+
+    // **************************************************
 
     const activationLink = `${process.env.BASE_URL}/activate/${activationToken}`;
-    // HTML content for the activation email
     const htmlContent = `
         <p>Hello ${user.firstName},</p>
         <p>Thank you for registering with AGR Group of Company. To activate your account, click the button below:</p>
@@ -82,16 +223,15 @@ const register = async (req, res) => {
         </a>
         `;
 
-    // Send the email with the activation link
     await sendEmail(user.email, "Account Activation", htmlContent);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Activation link sent to your email",
-      activationToken: activationToken,
+      // activationToken: activationToken,
     });
   } catch (error) {
     console.log("Error : ", error);
-    res.status(500).json({ error: "Internal Server" });
+    return res.status(500).json({ message: "Internal Server error...", error });
   }
 };
 
