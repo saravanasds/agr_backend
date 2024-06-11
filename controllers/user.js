@@ -68,7 +68,7 @@ const referralIncomeWithdrawRequest = async (req, res) => {
       return res.status(401).json({ message: "Insufficient Amount ..." });
     }
 
-    if (user.referralAmount < levelIncome) {
+    if (user.referralAmount < referralIncome) {
       return res.status(401).json({ message: "Invalid level Amount" });
     }
     if (referralIncome <= 0) {
