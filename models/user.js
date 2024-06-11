@@ -116,6 +116,34 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // totalEarning: {
+    //   type: Number,
+    //   default : 0,
+    // },
+    // walletBalance: {
+    //   type: Number,
+    //   default: 0,
+    // },
+    presentLevelIncome : {
+      type : Number,
+      default : 0,
+    },
+    presentReferralIncome : {
+      type : Number,
+      default : 0,
+    },
+    totalWithdrawAmount: {
+      type: Number,
+      default: 0,
+    },
+    totalLevelWithdrawAmount : {
+      type : Number, 
+      default : 0,
+    },
+    totalReferralWithdrawAmount : {
+      type : Number,
+      default : 0
+    },
     activationToken: {
       type: String,
     },
@@ -143,46 +171,17 @@ const userSchema = new mongoose.Schema(
     allParent: {
       type: Array,
     },
-    nestedParent : {
-      type : String,
+    nestedParent: {
+      type: String,
     },
     child: {
       type: Array,
     },
-    allChild : {
-      type : Array,
-    },
-    totalEarning: {
-      type: Number,
-    },
-    walletBalance: {
-      type: Number,
-    },
-    withdrawAmount: {
-      type: Number,
+    allChild: {
+      type: Array,
     },
     withdrawHistory: {
-      date: {
-        type: Date,
-      },
-      withdrawAmount: {
-        type: Number,
-      },
-      transactionNo: {
-        type: String,
-      },
-      status: {
-        type: String,
-      },
-      withdrawBankAccountNo: {
-        type: String,
-      },
-      withdrawBankAccountName: {
-        type: String,
-      },
-      withdrawIfsc: {
-        type: String,
-      },
+      type: Array,
     },
   },
   {
@@ -212,3 +211,28 @@ userSchema.pre("save", async function (next) {
 const User = mongoose.model("user", userSchema);
 
 export { User };
+
+
+// {
+//       date: {
+//         type: Date,
+//       },
+//       withdrawAmount: {
+//         type: Number,
+//       },
+//       transactionNo: {
+//         type: String,
+//       },
+//       status: {
+//         type: String,
+//       },
+//       withdrawBankAccountNo: {
+//         type: String,
+//       },
+//       withdrawBankAccountName: {
+//         type: String,
+//       },
+//       withdrawIfsc: {
+//         type: String,
+//       },
+//     },

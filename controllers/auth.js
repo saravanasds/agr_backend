@@ -14,8 +14,7 @@ import {
   generateReferralId,
   getUsersOrderedByLevel,
 } from "../utils/user.js";
-import { request } from "express";
-import { Admin } from "../models/admin.js";
+// import { request } from "express";
 
 const getPrivateData = (req, res) => {
   console.log(req.user);
@@ -41,8 +40,6 @@ const userExist = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    // const userData = req.body;
-    // console.log(userData)
     // console.log(req.files)
 
     let user = await getUserByEmail(req);
@@ -58,7 +55,7 @@ const register = async (req, res) => {
 
     const referralId = generateReferralId();
     let allParent = [];
-
+ 
     if (
       !req.files ||
       !req.files.adharProof ||
@@ -104,6 +101,7 @@ const register = async (req, res) => {
 
     let currentParentReferralId = "";
     let allParents = [];
+    let currentParentAllChild = [];
 
     for (const userData of allUsers) {
       if (userData.level === 1 && userData.child.length < 3) {
@@ -120,6 +118,7 @@ const register = async (req, res) => {
         await user.save();
 
         userData.allChild.push(user.referralId);
+        currentParentAllChild.push(userData.allChild);
 
         if (userData.child.length === 3) {
           userData.level = 2;
@@ -128,7 +127,6 @@ const register = async (req, res) => {
         await userData.save();
         break;
       }
-
     }
 
     user.allParent = allParent;
@@ -143,69 +141,72 @@ const register = async (req, res) => {
       }
 
       if (allParent.includes(userData.referralId)) {
-        if (currentParentReferralId != userData.referralId) {
+        if (userData.referralId != currentParentReferralId  && currentParentAllChild != 3) {
           userData.amount += 100;
           userData.levelAmount += 100;
         }
-        // await userData.save();
-        // break;
       }
+
       if (allParents.includes(userData.referralId)) {
         userData.allChild.push(user.referralId);
       }
-      // if(userData.level === 2 && userData.allChild.length > 3 && userData.allChild.length < 12){
-      //   userData.level = 3;
-      //   // 2 level income
-      //   userData.amount += 500;
-      //   userData.levelAmount += 500;
-      // }
-      if(userData.level === 2 && userData.allChild.length >= 12 && userData.allChild.length < 39){
+
+      if (
+        userData.level === 2 &&
+        userData.allChild.length >= 12 &&
+        userData.allChild.length < 39
+      ) {
         userData.level = 3;
-        // 3 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 3 && userData.allChild.length >= 39 && userData.allChild.length < 120){
+
+      if (
+        userData.level === 3 &&
+        userData.allChild.length >= 39 &&
+        userData.allChild.length < 120
+      ) {
         userData.level = 4;
-        // 3 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 4 && userData.allChild.length >= 120 && userData.allChild.length < 363){
+      if (
+        userData.level === 4 &&
+        userData.allChild.length >= 120 &&
+        userData.allChild.length < 363
+      ) {
         userData.level = 5;
-        // 4 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 5 && userData.allChild.length >= 363 && userData.allChild.length < 1092){
+      if (
+        userData.level === 5 &&
+        userData.allChild.length >= 363 &&
+        userData.allChild.length < 1092
+      ) {
         userData.level = 6;
-        // 5 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 6 && userData.allChild.length >= 1092 && userData.allChild.length < 3279){
+      if (
+        userData.level === 6 &&
+        userData.allChild.length >= 1092 &&
+        userData.allChild.length < 3279
+      ) {
         userData.level = 7;
-        // 6 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 7 && userData.allChild.length >= 3279 && userData.allChild.length < 9840){
+      if (
+        userData.level === 7 &&
+        userData.allChild.length >= 3279 &&
+        userData.allChild.length < 9840
+      ) {
         userData.level = 8;
-        // 7 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 8 && userData.allChild.length >= 9840 && userData.allChild.length < 29523){
+      if (
+        userData.level === 8 &&
+        userData.allChild.length >= 9840 &&
+        userData.allChild.length < 29523
+      ) {
         userData.level = 9;
-        // 2 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
-      if(userData.level === 9 && userData.allChild.length >= 29523 && userData.allChild.length < 88572){
+      if (
+        userData.level === 9 &&
+        userData.allChild.length >= 29523 &&
+        userData.allChild.length < 88572
+      ) {
         userData.level = 10;
-        // 2 level income
-        userData.amount += 500;
-        userData.levelAmount += 500;
       }
       await userData.save();
     }

@@ -26,9 +26,17 @@ const withdrawRequestSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    withdrawRequestAmount: {
-      type: Number,
-      required: true,
+    // withdrawRequestAmount: {
+    //   type: Number,
+    //   required: true,
+    // },
+    levelIncome: {
+      type : Number,
+      default : 0,
+    },
+    referralIncome: {
+      type : Number,
+      default : 0,
     },
     mobileNumber: {
       type: String,

@@ -9,7 +9,7 @@ import {
   verifyRandomString,
   getPrivateData,
 } from "../controllers/auth.js";
-import { withdrawRequest} from "../controllers/user.js";
+import { notification, levelIncomeWithdrawRequest, referralIncomeWithdrawRequest} from "../controllers/user.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
 
@@ -47,6 +47,8 @@ router.post("/forgotpassword", forgotPassword);
 router.get("/verifyRandomString/:randomString", verifyRandomString);
 router.put("/resetpassword/:randomString", resetpassword);
 router.get("/private", protectRoute, getPrivateData);
-router.post("/withdrawRequest", protectRoute, withdrawRequest);
+router.post("/levelIncomeWithdrawRequest", protectRoute, levelIncomeWithdrawRequest);
+router.post("/referralIncomeWithdrawRequest", protectRoute, referralIncomeWithdrawRequest);
+router.post("/notification", notification);
 
 export const authRouter = router;

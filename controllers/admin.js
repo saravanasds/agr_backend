@@ -5,6 +5,7 @@ import { Admin } from "../models/admin.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import jwt from "jsonwebtoken";
 import { WithdrawRequest } from "../models/withdraw.js";
+import { Notification } from "../models/notification.js";
 
 const register = async (req, res) => {
   try {
@@ -96,11 +97,11 @@ const activateUser = async (req, res) => {
 const allUsers = async (req, res) => {
   try {
     const allUser = await User.find({});
-    if (!allUser) {
+    if (!allUser.length) {
       return res.status(401).json({ message: "Users not available..." });
     }
 
-    return res.status(200).json({ data: allUser });
+    return res.status(200).json({ result: allUser });
   } catch (error) {
     res.status(500).json({ message: "Internal server error...", error });
   }
@@ -132,36 +133,121 @@ const deactivatedUser = async (req, res) => {
 
     return res.status(200).json({ activatedUsers: activeUsers });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error...", error });
+    return res.status(500).json({ message: "Internal server error...", error });
+  }
+};
+
+const withdrawRequestUsers = async (req, res) => {
+  try {
+    const withdrawUsers = await WithdrawRequest.find({});
+
+    return res.status(200).json({ result: withdrawUsers });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+const approveWithdrawRequest = async (req, res) => {
+  console.log("hi");
+  try {
+    const {
+      email,
+      withdrawRequestId,
+      date,
+      withdrawLevelIncome,
+      withdrawRefferalIncome,
+      transactionNo,
+      paymentStatus,
+      withdrawBankAccountName,
+      withdrawBankAccountNo,
+      withdrawIfsc,
+    } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "user not found ..." });
+    }
+    const withdrawRequest = await WithdrawRequest.findOne({
+      withdrawRequestId: withdrawRequestId,
+    });
+
+    if (!withdrawRequest) {
+      return res
+        .status(401)
+        .json({ message: "withdrawRequest id not found..." });
+    }
+
+    if (
+      !date ||
+      !transactionNo ||
+      !paymentStatus ||
+      !withdrawBankAccountNo ||
+      !withdrawBankAccountName ||
+      !withdrawIfsc
+    ) {
+      return res
+        .status(401)
+        .json({
+          message:
+            "date, withdrawLevelIncome, transactionNo,  paymentStatus, withdrawBankAccountNo, withdrawBankAccountName, withdrawIfsc all datas are mandatory",
+        });
+    }
+
+    const newData = [...user.withdrawHistory, req.body];
+    if (user.levelAmount < withdrawLevelIncome) {
+      return res.status(401).json({ message: "Insufficient level amount..." });
+    }
+    if (user.referralAmount < withdrawRefferalIncome) {
+      return res
+        .status(401)
+        .json({ message: "Insufficient referral amount..." });
+    }
+    // console.log(newData);
+    if (withdrawLevelIncome) {
+      user.totalLevelWithdrawAmount += withdrawLevelIncome;
+    }
+    if (withdrawRefferalIncome) {
+      user.totalReferralWithdrawAmount += withdrawRefferalIncome;
+    }
+    user.withdrawHistory = newData;
+    await user.save();
+    await withdrawRequest.deleteOne({ withdrawRequestId });
+
+    return res
+      .status(200)
+      .json({ message: "Transaction details saved successfully..." });
+  } catch (error) {
+    // console.log(error)
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+const notification = async (req, res) => {
+  try {
+    await new Notification({
+      ...req.body,
+    }).save();
+
+    return res.status(200).json({message : "Notification updated successfully..."})
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
-    const response = await User.deleteOne({
-      email: req.body.email,
-    });
-    if (response?.deletedCount === 0) {
-      return res
-        .status(401)
-        .send({ message: "User not found please check email..." });
-    }
-    return res.status(200).json({ message: "user deleted successfully" });
+    // const response = await User.deleteOne({
+    //   email: req.body.email,
+    // });
+    // if (response?.deletedCount === 0) {
+    //   return res
+    //     .status(401)
+    //     .send({ message: "User not found please check email..." });
+    // }
+    // return res.status(200).json({ message: "user deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
-
-const withdrawRequestUser = async (req, res) => {
-  try{
-    const withdrawUsers = await WithdrawRequest.find({});
-
-    res.status(200).json({ result: withdrawUsers });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
-
-  }
-}
 
 export {
   register,
@@ -171,5 +257,7 @@ export {
   activatedUser,
   deactivatedUser,
   allUsers,
-  withdrawRequestUser,
+  withdrawRequestUsers,
+  approveWithdrawRequest,
+  notification,
 };

@@ -15,7 +15,9 @@ function generateToken(user) {
     email,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRE });
+  // const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRE });
+  const token = jwt.sign(payload, JWT_SECRET_KEY);
+
   return token;
 }
 
