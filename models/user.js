@@ -79,9 +79,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    upiId: {
+    gpayNumber: {
       type: String,
-      required: true,
+      // required: true,
     },
     paymentDate: {
       type: Date,
