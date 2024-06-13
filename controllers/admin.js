@@ -1,18 +1,19 @@
-import { generateReferralId, getUserByEmail } from "../utils/user.js";
+import { getUserByEmail } from "../utils/user.js";
 
 import { User } from "../models/user.js";
 import { Admin } from "../models/admin.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import { WithdrawRequest } from "../models/withdraw.js";
 import { Notification } from "../models/notification.js";
+import { sendToken } from "../utils/jwt.js";
 
 const register = async (req, res) => {
   try {
     let admin = await Admin.findOne({
       email: req.body.email,
     });
-    console.log(admin);
+    // console.log(admin);
 
     if (admin) {
       return res.status(400).json({ message: "This admin aldready exist..." });
@@ -39,7 +40,7 @@ const login = async (req, res) => {
     let admin = await Admin.findOne({
       email: req.body.email,
     });
-    console.log(admin);
+    // console.log(admin);
 
     if (!admin) {
       return res
@@ -57,11 +58,13 @@ const login = async (req, res) => {
     }
 
     // const token = generateToken(admin);
-    const token = jwt.sign(
-      { _id: admin._id, email: admin.email },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "24h" }
-    );
+    // const token = jwt.sign(
+    //   { _id: admin._id, email: admin.email },
+    //   process.env.JWT_SECRET_KEY,
+    //   // { expiresIn: JWT_EXPIRE }
+    // );
+
+    const token = sendToken(admin);
 
     return res
       .status(200)
@@ -146,11 +149,10 @@ const withdrawRequestUsers = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
-
 const approveWithdrawRequest = async (req, res) => {
-  console.log("hi");
   try {
     const {
+      adminEmail,
       email,
       withdrawRequestId,
       date,
@@ -158,14 +160,22 @@ const approveWithdrawRequest = async (req, res) => {
       withdrawRefferalIncome,
       transactionNo,
       paymentStatus,
-      withdrawBankAccountName,
-      withdrawBankAccountNo,
-      withdrawIfsc,
+      bankName,
+      bankAcno,
+      ifsc,
     } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "user not found ..." });
+
+    const admin = await Admin.findOne({ email: adminEmail });
+    if (!admin) {
+      return res.status(401).json({ message: "Admin not found ..." });
     }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found ..." });
+    }
+
     const withdrawRequest = await WithdrawRequest.findOne({
       withdrawRequestId: withdrawRequestId,
     });
@@ -173,51 +183,102 @@ const approveWithdrawRequest = async (req, res) => {
     if (!withdrawRequest) {
       return res
         .status(401)
-        .json({ message: "withdrawRequest id not found..." });
+        .json({ message: "Withdraw request ID not found..." });
     }
 
     if (
       !date ||
       !transactionNo ||
       !paymentStatus ||
-      !withdrawBankAccountNo ||
-      !withdrawBankAccountName ||
-      !withdrawIfsc
+      !bankAcno ||
+      !bankName ||
+      !ifsc
     ) {
-      return res
-        .status(401)
-        .json({
-          message:
-            "date, withdrawLevelIncome, transactionNo,  paymentStatus, withdrawBankAccountNo, withdrawBankAccountName, withdrawIfsc all datas are mandatory",
-        });
+      return res.status(401).json({
+        message:
+          "date, withdrawLevelIncome, transactionNo, paymentStatus, bankAcno, bankName, ifsc are all mandatory",
+      });
     }
 
-    const newData = [...user.withdrawHistory, req.body];
     if (user.levelAmount < withdrawLevelIncome) {
       return res.status(401).json({ message: "Insufficient level amount..." });
     }
+
     if (user.referralAmount < withdrawRefferalIncome) {
       return res
         .status(401)
         .json({ message: "Insufficient referral amount..." });
     }
-    // console.log(newData);
+
+    user.withdrawHistory.push(req.body);
+
+    admin.withdrawHistory.push(req.body);
+
     if (withdrawLevelIncome) {
       user.totalLevelWithdrawAmount += withdrawLevelIncome;
+      user.availableLevelIncome =
+        user.levelAmount - user.totalLevelWithdrawAmount;
     }
     if (withdrawRefferalIncome) {
       user.totalReferralWithdrawAmount += withdrawRefferalIncome;
+      user.availableReferralIncome =
+        user.referralAmount - user.totalReferralWithdrawAmount;
     }
-    user.withdrawHistory = newData;
+
     await user.save();
-    await withdrawRequest.deleteOne({ withdrawRequestId });
+    await admin.save();
+
+    await WithdrawRequest.deleteOne({ withdrawRequestId });
 
     return res
       .status(200)
       .json({ message: "Transaction details saved successfully..." });
   } catch (error) {
-    // console.log(error)
+    console.log(error);
     return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+const rejectWithdrawRequest = async (req, res) => {
+  try {
+    console.log("1")
+    const { adminEmail, email, withdrawRequestId } = req.body;
+    const admin = await Admin.findOne({ email: adminEmail });
+    if (!admin) {
+      return res.status(401).json({ message: "Admin not found ..." });
+    }
+
+    const user = await User.findOne({ email });
+    console.log("2");
+    if (!user) {
+    console.log(user);
+
+
+      return res.status(401).json({ message: "User not found ..." });
+    }
+    console.log("3");
+
+    user.withdrawHistory.push(req.body);
+
+    admin.withdrawHistory.push(req.body);
+
+        const withdrawRequest = await WithdrawRequest.findOne({
+          withdrawRequestId: withdrawRequestId,
+        });
+
+        if (!withdrawRequest) {
+          return res
+            .status(401)
+            .json({ message: "Withdraw request ID not found..." });
+        }
+
+    await user.save();
+    await admin.save();
+    await WithdrawRequest.deleteOne({ withdrawRequestId });
+
+    return res.status(200).json({message : "Rejected successfully..."})
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error..." });
   }
 };
 
@@ -227,7 +288,9 @@ const notification = async (req, res) => {
       ...req.body,
     }).save();
 
-    return res.status(200).json({message : "Notification updated successfully..."})
+    return res
+      .status(200)
+      .json({ message: "Notification updated successfully..." });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
@@ -260,4 +323,5 @@ export {
   withdrawRequestUsers,
   approveWithdrawRequest,
   notification,
+  rejectWithdrawRequest,
 };

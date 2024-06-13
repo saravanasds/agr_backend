@@ -27,6 +27,10 @@ const adminSchema = new mongoose.Schema(
     referredBy: {
       type: Array,
     },
+    withdrawHistory: {
+      type: Array,
+      default : []
+    },
   },
   {
     timestamps: true,

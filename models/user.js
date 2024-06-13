@@ -81,7 +81,6 @@ const userSchema = new mongoose.Schema(
     },
     gpayNumber: {
       type: String,
-      // required: true,
     },
     paymentDate: {
       type: Date,
@@ -124,11 +123,11 @@ const userSchema = new mongoose.Schema(
     //   type: Number,
     //   default: 0,
     // },
-    presentLevelIncome : {
+    availableLevelIncome : {
       type : Number,
       default : 0,
     },
-    presentReferralIncome : {
+    availableReferralIncome : {
       type : Number,
       default : 0,
     },
