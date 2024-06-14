@@ -312,23 +312,24 @@ const notification = async (req, res) => {
 
 const assignBonus = async (req, res) => {
   try {
-    const {referralId, bonusValue, subject, date} = req.body;
+    const {name, bankAcno, transactionNo, referralId, bonusValue, subject, date} = req.body;
     
     const user = await User.findOne({referralId});
+
     if(!user){
-      return res.status(400).json({message : "user not found"});
+      return res.status(400).json({message : "user not found"})
     }
-    if(!referralId || !bonusValue || !subject || !date){
+    if(!name || !referralId || !bankAcno || !transactionNo || !bonusValue || !subject || !date){
       return res.status(400).json({message : "All fields are required"});
     }
     const withHistory = new WithdrawHistory({});
 
     user.bonusAmount = bonusValue;
     user.totalBonusAmount += bonusValue;
-    user.amount += bonusValue;
-    user.withdrawHistory.push({user:user.email, referralId, bonusValue, subject, date});
+    user.amount += bonusValue; 
+    user.withdrawHistory.push({email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo});
     withHistory.withdrawHistory.push({
-      user:user.email, referralId, bonusValue, subject, date
+      email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo
     })
     await withHistory.save();
     await user.save();
@@ -341,14 +342,36 @@ const assignBonus = async (req, res) => {
 
 const bonusHistory = async (req, res) => {
   try {
-    const users = await User.find({}, 'withdrawHistory');
-    const bonusHistory = users.flatMap(user => user.withdrawHistory);
+    const users = await User.find({}, "withdrawHistory");
+    const bonusHistory = users.flatMap((user) => user.withdrawHistory);
 
     return res.status(200).json(bonusHistory);
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
-}
+};
+
+const referralHistory = async (req, res) => {
+  try {
+    const users = await User.find({}, "withdrawHistory");
+    const referralHistory = users.flatMap((user) => user.withdrawHistory);
+
+    return res.status(200).json(referralHistory);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+// const levelIncomeHistory = async (req, res) => {
+//   try {
+//     const users = await User.find({}, "withdrawHistory");
+//     const levelIncomeHistory = users.flatMap((user) => user.withdrawHistory);
+
+//     return res.status(200).json(levelIncomeHistory);
+//   } catch (error) {
+//     return res.status(500).json({ message: "Internal Server Error", error });
+//   }
+// };
 
 const deleteUser = async (req, res) => {
   try {
@@ -379,5 +402,7 @@ export {
   notification,
   rejectWithdrawRequest,
   assignBonus,
-  bonusHistory
+  bonusHistory,
+  referralHistory,
+  // levelIncomeHistory
 };

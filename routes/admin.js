@@ -12,7 +12,9 @@ import {
   notification,
   rejectWithdrawRequest,
   assignBonus,
-  bonusHistory
+  bonusHistory,
+  referralHistory,
+  // levelIncomeHistory
 } from "../controllers/admin.js";
 import { protectRoute } from "../middleware/auth.js";
 
@@ -30,5 +32,7 @@ router.post("/rejectWithdrawRequest", protectRoute, rejectWithdrawRequest);
 router.post("/notification", protectRoute, notification);
 router.post("/assignBonus", protectRoute, assignBonus);
 router.get("/bonusHistory", protectRoute, bonusHistory);
+router.get("/referralHistory", protectRoute, referralHistory);
+// router.get("/levelIncomeHistory", protectRoute, levelIncomeHistory);
 
 export const adminRouter = router;

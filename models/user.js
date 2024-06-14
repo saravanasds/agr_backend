@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Counter } from "./counter.js";
+// import { Counter } from "./counter.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -123,14 +123,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    // totalEarning: {
-    //   type: Number,
-    //   default : 0,
-    // },
-    // walletBalance: {
-    //   type: Number,
-    //   default: 0,
-    // },
     availableLevelIncome: {
       type: Number,
       default: 0,
@@ -168,10 +160,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
-    id: {
-      type: Number,
-      unique: true,
-    },
     level: {
       type: Number,
     },
@@ -196,24 +184,24 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre("save", async function (next) {
-  let doc = this;
-  if (doc.isNew) {
-    try {
-      const counter = await Counter.findByIdAndUpdate(
-        { _id: "id" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true }
-      );
-      doc.id = counter.seq;
-      next();
-    } catch (error) {
-      next(error);
-    }
-  } else {
-    next();
-  }
-});
+// userSchema.pre("save", async function (next) {
+//   let doc = this;
+//   if (doc.isNew) {
+//     try {
+//       const counter = await Counter.findByIdAndUpdate(
+//         { _id: "id" },
+//         { $inc: { seq: 1 } },
+//         { new: true, upsert: true }
+//       ); 
+//       doc.id = counter.seq;
+//       next();
+//     } catch (error) {
+//       next(error);
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 const User = mongoose.model("user", userSchema);
 

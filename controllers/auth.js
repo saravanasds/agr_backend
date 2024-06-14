@@ -12,8 +12,8 @@ import {
   getUserByEmail,
   getUserByRandomString,
   generateReferralId,
-  getUsersOrderedByLevel,
 } from "../utils/user.js";
+import { uniqId } from "../utils/uniqId.js";
 // import { request } from "express";
 
 const getPrivateData = (req, res) => {
@@ -53,7 +53,9 @@ const register = async (req, res) => {
 
     const activationToken = generateActivationToken();
 
-    const referralId = generateReferralId();
+    // const referralId = generateReferralId();
+    const referralId = await uniqId();
+
     let allParent = [];
 
     if (
@@ -85,7 +87,7 @@ const register = async (req, res) => {
       referredBy = "";
     }
 
-    user = await new User({
+    user = new User({
       ...req.body,
       level: 1,
       password: hashedPassword,
@@ -265,6 +267,7 @@ const activateUserEmail = async (req, res) => {
       message: "Email verified successfully",
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "Internal Server", error });
   }
 };
