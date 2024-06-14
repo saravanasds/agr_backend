@@ -17,7 +17,7 @@ import {
 // import { request } from "express";
 
 const getPrivateData = (req, res) => {
-  console.log(req.user);
+  // console.log(req.user);
   return res.status(200).json({
     success: true,
     message: "You got access to the private data in this route",
@@ -55,7 +55,7 @@ const register = async (req, res) => {
 
     const referralId = generateReferralId();
     let allParent = [];
- 
+
     if (
       !req.files ||
       !req.files.adharProof ||
@@ -124,6 +124,11 @@ const register = async (req, res) => {
           userData.level = 2;
         }
 
+        userData.availableLevelIncome =
+          userData.levelAmount - userData.totalLevelWithdrawAmount;
+        userData.availableReferralIncome =
+          userData.referralAmount - userData.totalReferralWithdrawAmount;
+
         await userData.save();
         break;
       }
@@ -141,7 +146,10 @@ const register = async (req, res) => {
       }
 
       if (allParent.includes(userData.referralId)) {
-        if (userData.referralId != currentParentReferralId  && currentParentAllChild != 3) {
+        if (
+          userData.referralId != currentParentReferralId &&
+          currentParentAllChild != 3
+        ) {
           userData.amount += 100;
           userData.levelAmount += 100;
         }
@@ -208,6 +216,11 @@ const register = async (req, res) => {
       ) {
         userData.level = 10;
       }
+      userData.availableLevelIncome =
+        userData.levelAmount - userData.totalLevelWithdrawAmount;
+      userData.availableReferralIncome =
+        userData.referralAmount - userData.totalReferralWithdrawAmount;
+
       await userData.save();
     }
 
@@ -239,7 +252,7 @@ const register = async (req, res) => {
 const activateUserEmail = async (req, res) => {
   try {
     const user = await getUserByActivationToken(req);
-    console.log("controllers/auth.js 116 :", user);
+    // console.log("controllers/auth.js 116 :", user);
     if (!user) {
       return res.status(400).json({ error: "Invalid activation token!" });
     }

@@ -7,6 +7,7 @@ import { comparePassword, hashPassword } from "../utils/password.js";
 import { WithdrawRequest } from "../models/withdraw.js";
 import { Notification } from "../models/notification.js";
 import { sendToken } from "../utils/jwt.js";
+import { WithdrawHistory } from "../models/withdrawHistory.js";
 
 const register = async (req, res) => {
   try {
@@ -44,7 +45,7 @@ const login = async (req, res) => {
 
     if (!admin) {
       return res
-        .status(401)
+        .status(400)
         .json({ message: "Admin not found, please check email..." });
     }
 
@@ -54,7 +55,7 @@ const login = async (req, res) => {
     );
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid password..." });
+      return res.status(400).json({ message: "Invalid password..." });
     }
 
     // const token = generateToken(admin);
@@ -101,7 +102,7 @@ const allUsers = async (req, res) => {
   try {
     const allUser = await User.find({});
     if (!allUser.length) {
-      return res.status(401).json({ message: "Users not available..." });
+      return res.status(400).json({ message: "Users not available..." });
     }
 
     return res.status(200).json({ result: allUser });
@@ -152,7 +153,6 @@ const withdrawRequestUsers = async (req, res) => {
 const approveWithdrawRequest = async (req, res) => {
   try {
     const {
-      adminEmail,
       email,
       withdrawRequestId,
       date,
@@ -165,15 +165,14 @@ const approveWithdrawRequest = async (req, res) => {
       ifsc,
     } = req.body;
 
-    const admin = await Admin.findOne({ email: adminEmail });
-    if (!admin) {
-      return res.status(401).json({ message: "Admin not found ..." });
-    }
+    const withHistory = new WithdrawHistory({
+      ...req.body,
+    });
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: "User not found ..." });
+      return res.status(404).json({ message: "User not found ..." });
     }
 
     const withdrawRequest = await WithdrawRequest.findOne({
@@ -182,7 +181,7 @@ const approveWithdrawRequest = async (req, res) => {
 
     if (!withdrawRequest) {
       return res
-        .status(401)
+        .status(400)
         .json({ message: "Withdraw request ID not found..." });
     }
 
@@ -194,39 +193,46 @@ const approveWithdrawRequest = async (req, res) => {
       !bankName ||
       !ifsc
     ) {
-      return res.status(401).json({
+      return res.status(400).json({
         message:
           "date, withdrawLevelIncome, transactionNo, paymentStatus, bankAcno, bankName, ifsc are all mandatory",
       });
     }
+    const presLevelIncome = user.levelAmount - user.totalLevelWithdrawAmount;
+    const presrefIncome =
+      user.referralAmount - user.totalReferralWithdrawAmount;
 
-    if (user.levelAmount < withdrawLevelIncome) {
-      return res.status(401).json({ message: "Insufficient level amount..." });
+    if (presLevelIncome < withdrawLevelIncome) {
+      return res.status(400).json({ message: "Insufficient level amount..." });
     }
 
-    if (user.referralAmount < withdrawRefferalIncome) {
+    if (presrefIncome < withdrawRefferalIncome) {
       return res
-        .status(401)
+        .status(400)
         .json({ message: "Insufficient referral amount..." });
     }
 
     user.withdrawHistory.push(req.body);
 
-    admin.withdrawHistory.push(req.body);
+    // admin.withdrawHistory.push(req.body);
+    // console.log(withHistory);
+    withHistory.withdrawHistory.push(req.body);
 
     if (withdrawLevelIncome) {
       user.totalLevelWithdrawAmount += withdrawLevelIncome;
-      user.availableLevelIncome =
-        user.levelAmount - user.totalLevelWithdrawAmount;
-    }
-    if (withdrawRefferalIncome) {
-      user.totalReferralWithdrawAmount += withdrawRefferalIncome;
-      user.availableReferralIncome =
-        user.referralAmount - user.totalReferralWithdrawAmount;
     }
 
+    if (withdrawRefferalIncome) {
+      user.totalReferralWithdrawAmount += withdrawRefferalIncome;
+    }
+    user.availableLevelIncome =
+      user.levelAmount - user.totalLevelWithdrawAmount;
+    user.availableReferralIncome =
+      user.referralAmount - user.totalReferralWithdrawAmount;
+
     await user.save();
-    await admin.save();
+    // await admin.save();
+    await withHistory.save();
 
     await WithdrawRequest.deleteOne({ withdrawRequestId });
 
@@ -241,42 +247,49 @@ const approveWithdrawRequest = async (req, res) => {
 
 const rejectWithdrawRequest = async (req, res) => {
   try {
-    console.log("1")
-    const { adminEmail, email, withdrawRequestId } = req.body;
-    const admin = await Admin.findOne({ email: adminEmail });
-    if (!admin) {
-      return res.status(401).json({ message: "Admin not found ..." });
-    }
+    const { email, withdrawRequestId } = req.body;
+    console.log("cont/admin reject 249 : ", req.body);
+    // const admin = await Admin.findOne({ email: adminEmail });
+
+    // if (!admin) {
+    //   return res.status(400).json({ message: "Admin not found ..." });
+    // }
 
     const user = await User.findOne({ email });
-    console.log("2");
     if (!user) {
-    console.log(user);
+      console.log(user);
 
-
-      return res.status(401).json({ message: "User not found ..." });
+      return res.status(400).json({ message: "User not found ..." });
     }
-    console.log("3");
+    const withHistory = new WithdrawHistory({
+      ...req.body,
+    });
+
+    const withdrawRequest = await WithdrawRequest.findOne({
+      withdrawRequestId: withdrawRequestId,
+    });
+
+    if (!withdrawRequest) {
+      return res
+        .status(400)
+        .json({ message: "Withdraw request ID not found..." });
+    }
+
+    user.availableLevelIncome =
+      user.levelAmount - user.totalLevelWithdrawAmount;
+    user.availableReferralIncome =
+      user.referralAmount - user.totalReferralWithdrawAmount;
 
     user.withdrawHistory.push(req.body);
 
-    admin.withdrawHistory.push(req.body);
-
-        const withdrawRequest = await WithdrawRequest.findOne({
-          withdrawRequestId: withdrawRequestId,
-        });
-
-        if (!withdrawRequest) {
-          return res
-            .status(401)
-            .json({ message: "Withdraw request ID not found..." });
-        }
+    withHistory.withdrawHistory.push(req.body);
 
     await user.save();
-    await admin.save();
+    // await admin.save();
+    await withHistory.save();
     await WithdrawRequest.deleteOne({ withdrawRequestId });
 
-    return res.status(200).json({message : "Rejected successfully..."})
+    return res.status(200).json({ message: "Rejected successfully..." });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error..." });
   }
@@ -303,7 +316,7 @@ const deleteUser = async (req, res) => {
     // });
     // if (response?.deletedCount === 0) {
     //   return res
-    //     .status(401)
+    //     .status(400)
     //     .send({ message: "User not found please check email..." });
     // }
     // return res.status(200).json({ message: "user deleted successfully" });

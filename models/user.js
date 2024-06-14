@@ -81,6 +81,7 @@ const userSchema = new mongoose.Schema(
     },
     gpayNumber: {
       type: String,
+      // required: true,
     },
     paymentDate: {
       type: Date,

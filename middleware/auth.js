@@ -9,18 +9,15 @@ upload.any(); // This will catch Multer errors
 export const protectRoute = (req, res, next) => {
   const token = req.header("Authorization");
 
-  console.log(token)
+  // console.log("middleware auth token 12 : ",token)
   if (!token || !token.startsWith("Bearer ")) {
     throw new CustomError("Access denied. Invalid token.", 401);
   }
 
   const authToken = token.slice(7); // Remove 'Bearer ' prefix
 
-  console.log("auth token :", authToken)
-  console.log("process.env.JWT_SECRET_KEY :", process.env.JWT_SECRET_KEY);
-  try {
+ try {
     const decoded = jwt.verify(authToken, process.env.JWT_SECRET_KEY);
-    console.log("decoded : " , decoded)
     req.user = decoded;
     next();
   } catch (error) {

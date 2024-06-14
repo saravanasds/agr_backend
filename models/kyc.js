@@ -67,7 +67,7 @@ const kycSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  gpayNumber: {
+  upiId: {
     type: String,
     required: true,
   },
