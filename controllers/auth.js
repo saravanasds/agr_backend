@@ -338,13 +338,13 @@ const forgotPassword = async (req, res, next) => {
     // Send the email with the password reset link
     await sendEmail(user.email, "Password Reset", htmlContent);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Password reset link sent to your email",
       resetToken: resetToken,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -362,10 +362,10 @@ const verifyRandomString = async (req, res, next) => {
       res.status(400).json({ error: "Password reset link has expired" });
     }
 
-    res.status(200).json({ message: "Random String Verified" });
+    return res.status(200).json({ message: "Random String Verified" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -394,10 +394,10 @@ const resetpassword = async (req, res, next) => {
     // Save the user with the updated password
     await user.save();
 
-    res.status(200).json({ message: "Password reset successful" });
+    return res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

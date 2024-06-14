@@ -8,6 +8,7 @@ import { WithdrawRequest } from "../models/withdraw.js";
 import { Notification } from "../models/notification.js";
 import { sendToken } from "../utils/jwt.js";
 import { WithdrawHistory } from "../models/withdrawHistory.js";
+import { Bonus } from "../models/bonus.js";
 
 const register = async (req, res) => {
   try {
@@ -309,6 +310,46 @@ const notification = async (req, res) => {
   }
 };
 
+const assignBonus = async (req, res) => {
+  try {
+    const {referralId, bonusValue, subject, date} = req.body;
+    
+    const user = await User.findOne({referralId});
+    if(!user){
+      return res.status(400).json({message : "user not found"});
+    }
+    if(!referralId || !bonusValue || !subject || !date){
+      return res.status(400).json({message : "All fields are required"});
+    }
+    const withHistory = new WithdrawHistory({});
+
+    user.bonusAmount = bonusValue;
+    user.totalBonusAmount += bonusValue;
+    user.amount += bonusValue;
+    user.withdrawHistory.push({user:user.email, referralId, bonusValue, subject, date});
+    withHistory.withdrawHistory.push({
+      user:user.email, referralId, bonusValue, subject, date
+    })
+    await withHistory.save();
+    await user.save();
+    
+    return res.status(200).json({message : "Bonus sent successfully"})
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+const bonusHistory = async (req, res) => {
+  try {
+    const users = await User.find({}, 'withdrawHistory');
+    const bonusHistory = users.flatMap(user => user.withdrawHistory);
+
+    return res.status(200).json(bonusHistory);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+}
+
 const deleteUser = async (req, res) => {
   try {
     // const response = await User.deleteOne({
@@ -337,4 +378,6 @@ export {
   approveWithdrawRequest,
   notification,
   rejectWithdrawRequest,
+  assignBonus,
+  bonusHistory
 };

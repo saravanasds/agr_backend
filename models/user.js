@@ -81,7 +81,6 @@ const userSchema = new mongoose.Schema(
     },
     gpayNumber: {
       type: String,
-      // required: true,
     },
     paymentDate: {
       type: Date,
@@ -116,6 +115,14 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    bonusAmount: {
+      type: Number,
+      default: 0,
+    },
+    totalBonusAmount: {
+      type: Number,
+      default: 0,
+    },
     // totalEarning: {
     //   type: Number,
     //   default : 0,
@@ -124,25 +131,25 @@ const userSchema = new mongoose.Schema(
     //   type: Number,
     //   default: 0,
     // },
-    availableLevelIncome : {
-      type : Number,
-      default : 0,
+    availableLevelIncome: {
+      type: Number,
+      default: 0,
     },
-    availableReferralIncome : {
-      type : Number,
-      default : 0,
+    availableReferralIncome: {
+      type: Number,
+      default: 0,
     },
     totalWithdrawAmount: {
       type: Number,
       default: 0,
     },
-    totalLevelWithdrawAmount : {
-      type : Number, 
-      default : 0,
+    totalLevelWithdrawAmount: {
+      type: Number,
+      default: 0,
     },
-    totalReferralWithdrawAmount : {
-      type : Number,
-      default : 0
+    totalReferralWithdrawAmount: {
+      type: Number,
+      default: 0,
     },
     activationToken: {
       type: String,

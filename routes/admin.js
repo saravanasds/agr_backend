@@ -11,6 +11,8 @@ import {
   approveWithdrawRequest,
   notification,
   rejectWithdrawRequest,
+  assignBonus,
+  bonusHistory
 } from "../controllers/admin.js";
 import { protectRoute } from "../middleware/auth.js";
 
@@ -26,7 +28,7 @@ router.get("/withdrawRequestUser", protectRoute, withdrawRequestUsers);
 router.post("/approveWithdrawRequest", protectRoute, approveWithdrawRequest);
 router.post("/rejectWithdrawRequest", protectRoute, rejectWithdrawRequest);
 router.post("/notification", protectRoute, notification);
-
-
+router.post("/assignBonus", protectRoute, assignBonus);
+router.get("/bonusHistory", protectRoute, bonusHistory);
 
 export const adminRouter = router;
