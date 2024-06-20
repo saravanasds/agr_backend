@@ -18,9 +18,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 const corsOptions = {
-  origin: '*', 
-  methods: 'GET,POST,PUT,DELETE,OPTIONS', 
-  allowedHeaders: 'Content-Type, Authorization' 
+  origin: 'https://agrpremiumplan.in', // Allow only this origin
+  methods: 'GET,POST,PUT,DELETE,OPTIONS', // Allow these HTTP methods
+  allowedHeaders: 'Content-Type, Authorization', // Allow these headers
+  credentials: true // Include cookies in requests
 };
 
 app.use(cors(corsOptions));
