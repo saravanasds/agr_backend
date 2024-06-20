@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { dataBaseConnection } from "./config/database.js";
 import { indexRoutes } from "./routes/index.js";
-// import { initializeCounter } from "./config/initializeCounter.js";
 
 // Configuring the environmental variable
 dotenv.config();
@@ -12,26 +11,23 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 9000;
 
-// Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS configuration
+// CORS Configuration
 const corsOptions = {
-  origin: 'https://agrpremiumplan.in', // Allow only this origin
-  methods: 'GET,POST,PUT,DELETE,OPTIONS', // Allow these HTTP methods
-  allowedHeaders: 'Content-Type, Authorization', // Allow these headers
-  credentials: true // Include cookies in requests
+  origin: 'https://agrpremiumplan.in', // allow only this origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // allowed HTTP methods
+  credentials: true, // allow credentials (cookies, authorization headers, etc.)
+  optionsSuccessStatus: 204 // response status for successful OPTIONS requests
 };
 
+// Middlewares
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/uploads", express.static("uploads"));
 
 // Database Connection
 dataBaseConnection();
-
-// await initializeCounter();
 
 // Test Route
 app.get("/", async (req, res) => {
