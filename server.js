@@ -5,36 +5,42 @@ import { dataBaseConnection } from "./config/database.js";
 import { indexRoutes } from "./routes/index.js";
 // import { initializeCounter } from "./config/initializeCounter.js";
 
-//Configuring the environmental variable
+// Configuring the environmental variable
 dotenv.config();
 
-//Server Setup
+// Server Setup
 const app = express();
 const PORT = process.env.PORT || 9000;
 
-//Middlewares
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:5173', // Allow only this origin
+  methods: 'GET,POST,PUT,DELETE,OPTIONS', // Allow these HTTP methods
+  allowedHeaders: 'Content-Type, Authorization' // Allow these headers
+};
+
+app.use(cors(corsOptions));
+
 app.use("/uploads", express.static("uploads"));
 
-//Database Connection
+// Database Connection
 dataBaseConnection();
 
 // await initializeCounter();
 
-//Test Route
+// Test Route
 app.get("/", async (req, res) => {
-  return res
-    .status(200)
-    .send("This is AGR App Backend");
+  return res.status(200).send("This is AGR App Backend");
 });
 
-//Routes
+// Routes
 app.use("/api", indexRoutes);
 
-//Listening the Server
+// Listening the Server
 app.listen(PORT, () => {
-  console.log(`Server Started in localhost:${PORT}`);
+  console.log(`Server Started on localhost:${PORT}`);
 });
