@@ -47,11 +47,13 @@ const userSchema = new mongoose.Schema(
     },
     adharProof: {
       type: String,
+      required: true,
       // data: Buffer, // Changed to Buffer data type
       // contentType: String, // Added contentType to store MIME type
     },
     photo: {
       type: String,
+      required: true,
       // data: Buffer, // Changed to Buffer data type
       // contentType: String, // Added contentType to store MIME type
     },
@@ -92,6 +94,7 @@ const userSchema = new mongoose.Schema(
     },
     paymentScreenshot: {
       type: String,
+      required: true,
       // data: Buffer, // Changed to Buffer data type
       // contentType: String, // Added contentType to store MIME type
     },
