@@ -39,6 +39,8 @@ const userExist = async (req, res) => {
 };
 
 const register = async (req, res) => {
+  console.log("hi",req.files)
+  console.log("hello", req.body)
   try {
     // console.log(req.files)
 
