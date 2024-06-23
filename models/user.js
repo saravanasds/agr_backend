@@ -146,6 +146,22 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    referralWithdrawableAmount: {
+      type: Number,
+      default: 0,
+    },
+    levelWithdrawableAmount: {
+      type: Number,
+      default: 0,
+    },
+    levelWithdrawRequestAmount: {
+      type: Number,
+      default: 0,
+    },
+    levelValue: {
+      type: Number,
+      default: 0,
+    },
     activationToken: {
       type: String,
     },

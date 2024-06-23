@@ -11,7 +11,7 @@ import {
   getUserByActivationToken,
   getUserByEmail,
   getUserByRandomString,
-  generateReferralId,
+  // generateReferralId,
 } from "../utils/user.js";
 import { uniqId } from "../utils/uniqId.js";
 // import { request } from "express";
@@ -39,8 +39,6 @@ const userExist = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  console.log("hi",req.files)
-  console.log("hello", req.body)
   try {
     // console.log(req.files)
 
@@ -126,6 +124,8 @@ const register = async (req, res) => {
 
         if (userData.child.length === 3) {
           userData.level = 2;
+        userData.levelValue = 1500;
+
         }
 
         userData.availableLevelIncome =
@@ -147,6 +147,7 @@ const register = async (req, res) => {
         userData.referredPeoples.push(user.referralId);
         userData.amount += 500;
         userData.referralAmount += 500;
+        userData.referralWithdrawableAmount += 500;
       }
 
       if (allParent.includes(userData.referralId)) {
@@ -165,60 +166,76 @@ const register = async (req, res) => {
 
       if (
         userData.level === 2 &&
-        userData.allChild.length >= 12 &&
-        userData.allChild.length < 39
+        userData.allChild.length === 12
+        // userData.allChild.length >= 12 &&
+        // userData.allChild.length < 39
       ) {
         userData.level = 3;
+        userData.levelValue = 2400;
       }
 
       if (
         userData.level === 3 &&
-        userData.allChild.length >= 39 &&
-        userData.allChild.length < 120
+        userData.allChild.length === 39
+        // userData.allChild.length >= 39 &&
+        // userData.allChild.length < 120
       ) {
         userData.level = 4;
+        userData.levelValue = 5100;
       }
       if (
         userData.level === 4 &&
-        userData.allChild.length >= 120 &&
-        userData.allChild.length < 363
+        userData.allChild.length === 120
+        // userData.allChild.length >= 120 &&
+        // userData.allChild.length < 363
       ) {
         userData.level = 5;
+        userData.levelValue = 13200;
       }
       if (
         userData.level === 5 &&
-        userData.allChild.length >= 363 &&
-        userData.allChild.length < 1092
+        userData.allChild.length === 363
+        // userData.allChild.length >= 363 &&
+        // userData.allChild.length < 1092
       ) {
         userData.level = 6;
+        userData.levelValue = 37500;
       }
       if (
         userData.level === 6 &&
-        userData.allChild.length >= 1092 &&
-        userData.allChild.length < 3279
+        userData.allChild.length >= 1092
+        // userData.allChild.length >= 1092 &&
+        // userData.allChild.length < 3279
       ) {
         userData.level = 7;
+        userData.levelValue = 110400;
       }
       if (
         userData.level === 7 &&
-        userData.allChild.length >= 3279 &&
-        userData.allChild.length < 9840
+        userData.allChild.length >= 3279
+        // userData.allChild.length >= 3279 &&
+        // userData.allChild.length < 9840
       ) {
         userData.level = 8;
+        userData.levelValue = 329100;
       }
       if (
         userData.level === 8 &&
-        userData.allChild.length >= 9840 &&
-        userData.allChild.length < 29523
+        userData.allChild.length >= 9840
+        // userData.allChild.length >= 9840 &&
+        // userData.allChild.length < 29523
       ) {
         userData.level = 9;
+        userData.levelValue = 985200;
       }
       if (
         userData.level === 9 &&
-        userData.allChild.length >= 29523 &&
-        userData.allChild.length < 88572
+        userData.allChild.length >= 29523
+        // userData.allChild.length >= 29523 &&
+        // userData.allChild.length < 88572
       ) {
         userData.level = 10;
+        userData.levelValue = 2953500;
       }
       userData.availableLevelIncome =
         userData.levelAmount - userData.totalLevelWithdrawAmount;
@@ -269,7 +286,7 @@ const activateUserEmail = async (req, res) => {
       message: "Email verified successfully",
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: "Internal Server", error });
   }
 };
@@ -300,9 +317,9 @@ const login = async (req, res) => {
 
     // Generate and send an authentication token
     const token = sendToken(user);
-    const userName = user.firstName;
+    // const userName = user.firstName;
     // Respond with a success message and the token
-    res.status(200).json({ message: "Login successful", token, data: user });
+    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server" });

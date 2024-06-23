@@ -102,13 +102,13 @@ const activateUser = async (req, res) => {
 const allUsers = async (req, res) => {
   try {
     const allUser = await User.find({});
-    if (!allUser.length) {
-      return res.status(400).json({ message: "Users not available..." });
+    if (!allUser) {
+      return res.status(404).json({ message: "Users not available..." });
     }
 
     return res.status(200).json({ result: allUser });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error...", error });
+    return res.status(500).json({ message: "Internal server error...", error });
   }
 };
 
@@ -123,7 +123,7 @@ const activatedUser = async (req, res) => {
 
     return res.status(200).json({ activatedUsers: activeUsers });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error...", error });
+    return res.status(500).json({ message: "Internal server error...", error });
   }
 };
 
@@ -231,6 +231,10 @@ const approveWithdrawRequest = async (req, res) => {
     user.availableReferralIncome =
       user.referralAmount - user.totalReferralWithdrawAmount;
 
+      
+    user.levelWithdrawRequestAmount -= req.body.withdrawLevelIncome;
+    user.levelWithdrawableAmount -= req.body.withdrawLevelIncome;
+
     await user.save();
     // await admin.save();
     await withHistory.save();
@@ -275,18 +279,24 @@ const rejectWithdrawRequest = async (req, res) => {
         .status(400)
         .json({ message: "Withdraw request ID not found..." });
     }
-
+    // ---------------------------------------------
+    // update present available amount
     user.availableLevelIncome =
       user.levelAmount - user.totalLevelWithdrawAmount;
+
     user.availableReferralIncome =
       user.referralAmount - user.totalReferralWithdrawAmount;
+    // ---------------------------------------------
 
     user.withdrawHistory.push(req.body);
+    user.levelWithdrawableAmount += req.body.levelIncome;
+    user.levelWithdrawRequestAmount -= req.body.levelIncome;
+
+    user.referralWithdrawableAmount += req.body.referralIncome;
 
     withHistory.withdrawHistory.push(req.body);
 
     await user.save();
-    // await admin.save();
     await withHistory.save();
     await WithdrawRequest.deleteOne({ withdrawRequestId });
 
@@ -312,14 +322,14 @@ const notification = async (req, res) => {
 
 const assignBonus = async (req, res) => {
   try {
-    const {name, bankAcno, transactionNo, referralId, bonusValue, subject, date} = req.body;
+    const {referralId, bonusValue, subject, date} = req.body;
     
     const user = await User.findOne({referralId});
 
     if(!user){
       return res.status(400).json({message : "user not found"})
     }
-    if(!name || !referralId || !bankAcno || !transactionNo || !bonusValue || !subject || !date){
+    if(!referralId || !bonusValue || !subject || !date){
       return res.status(400).json({message : "All fields are required"});
     }
     const withHistory = new WithdrawHistory({});
@@ -327,9 +337,9 @@ const assignBonus = async (req, res) => {
     user.bonusAmount = bonusValue;
     user.totalBonusAmount += bonusValue;
     user.amount += bonusValue; 
-    user.withdrawHistory.push({email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo});
+    user.withdrawHistory.push({email : user.email, referralId, bonusValue, subject, date});
     withHistory.withdrawHistory.push({
-      email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo
+      email : user.email, referralId, bonusValue, subject, date
     })
     await withHistory.save();
     await user.save();
@@ -362,17 +372,6 @@ const referralHistory = async (req, res) => {
   }
 };
 
-// const levelIncomeHistory = async (req, res) => {
-//   try {
-//     const users = await User.find({}, "withdrawHistory");
-//     const levelIncomeHistory = users.flatMap((user) => user.withdrawHistory);
-
-//     return res.status(200).json(levelIncomeHistory);
-//   } catch (error) {
-//     return res.status(500).json({ message: "Internal Server Error", error });
-//   }
-// };
-
 const deleteUser = async (req, res) => {
   try {
     // const response = await User.deleteOne({
@@ -404,5 +403,4 @@ export {
   assignBonus,
   bonusHistory,
   referralHistory,
-  // levelIncomeHistory
 };

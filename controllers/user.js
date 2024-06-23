@@ -36,6 +36,13 @@ const levelIncomeWithdrawRequest = async (req, res) => {
         Math.floor(Math.random() * characters.length)
       );
     }
+    if(user.levelValue <= 0 ){
+      return res.status(400).json({message : "Amount not available"});
+    }
+
+    user.levelWithdrawRequestAmount += levelIncome;
+    user.levelWithdrawRequestAmount -= levelIncome;
+    // user.levelWithdrawableAmount = user.levelValue -  user.totalLevelWithdrawAmount + user.levelWithdrawRequestAmount;
 
     await new WithdrawRequest({
       ...req.body,
@@ -94,7 +101,9 @@ const referralIncomeWithdrawRequest = async (req, res) => {
     user.availableReferralIncome =
       user.referralAmount - user.totalReferralWithdrawAmount;
 
-      await user.save();
+    user.referralWithdrawableAmount -= referralIncome;
+
+    await user.save();
 
     await new WithdrawRequest({
       ...req.body,
@@ -122,21 +131,21 @@ const notification = async (req, res) => {
 
 const userData = async (req, res) => {
   try {
-    const user = await User.findOne({email: req.body.email});
-    if(!user){
-      return res.status(400).json({message : "user not found"});
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(400).json({ message: "user not found" });
     }
+    user.levelWithdrawableAmount = user.levelValue -  user.totalLevelWithdrawAmount + user.levelWithdrawRequestAmount;
 
-    return res.status(200).json({data : user});
+    return res.status(200).json({ data: user });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error...", error });
-    
   }
-}
+};
 
 export {
   levelIncomeWithdrawRequest,
   referralIncomeWithdrawRequest,
   notification,
-  userData
+  userData,
 };
