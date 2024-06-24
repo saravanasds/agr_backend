@@ -124,7 +124,7 @@ const register = async (req, res) => {
 
         if (userData.child.length === 3) {
           userData.level = 2;
-        userData.levelValue = 1500;
+          userData.levelValue = 1500;
 
         }
 
@@ -319,7 +319,7 @@ const login = async (req, res) => {
     const token = sendToken(user);
     // const userName = user.firstName;
     // Respond with a success message and the token
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({ message: "Login successful", token, data: user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server" });
