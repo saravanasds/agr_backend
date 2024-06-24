@@ -249,11 +249,9 @@ const approveWithdrawRequest = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
-
 const rejectWithdrawRequest = async (req, res) => {
   try {
-    const { email, withdrawRequestId } = req.body;
-    console.log("cont/admin reject 249 : ", req.body);
+    const { email, withdrawRequestId, withdrawLevelIncome } = req.body;
     // const admin = await Admin.findOne({ email: adminEmail });
 
     // if (!admin) {
@@ -261,19 +259,21 @@ const rejectWithdrawRequest = async (req, res) => {
     // }
 
     const user = await User.findOne({ email });
+
     if (!user) {
-      console.log(user);
+      // console.log(user);
+
 
       return res.status(400).json({ message: "User not found ..." });
     }
     const withHistory = new WithdrawHistory({
       ...req.body,
     });
-
+   
     const withdrawRequest = await WithdrawRequest.findOne({
       withdrawRequestId: withdrawRequestId,
     });
-
+  
     if (!withdrawRequest) {
       return res
         .status(400)
@@ -283,23 +283,22 @@ const rejectWithdrawRequest = async (req, res) => {
     // update present available amount
     user.availableLevelIncome =
       user.levelAmount - user.totalLevelWithdrawAmount;
-
+    //   console.log("cont/admin reject 288 : ");
     user.availableReferralIncome =
       user.referralAmount - user.totalReferralWithdrawAmount;
     // ---------------------------------------------
 
     user.withdrawHistory.push(req.body);
-    user.levelWithdrawableAmount += req.body.levelIncome;
-    user.levelWithdrawRequestAmount -= req.body.levelIncome;
-
-    user.referralWithdrawableAmount += req.body.referralIncome;
+    
+    user.levelWithdrawRequestAmount -= withdrawLevelIncome;
+    // console.log("cont/admin reject 296 : ");
+    user.levelWithdrawableAmount = user.levelValue - user.totalLevelWithdrawAmount - user.levelWithdrawRequestAmount;
+    user.referralWithdrawableAmount += req.body.withdrawRefferalIncome;
 
     withHistory.withdrawHistory.push(req.body);
-
     await user.save();
     await withHistory.save();
     await WithdrawRequest.deleteOne({ withdrawRequestId });
-
     return res.status(200).json({ message: "Rejected successfully..." });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error..." });
