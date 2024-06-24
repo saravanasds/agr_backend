@@ -41,7 +41,7 @@ const levelIncomeWithdrawRequest = async (req, res) => {
     }
 
     user.levelWithdrawRequestAmount += levelIncome;
-    user.levelWithdrawRequestAmount -= levelIncome;
+    user.levelWithdrawableAmount -= levelIncome;
     // user.levelWithdrawableAmount = user.levelValue -  user.totalLevelWithdrawAmount + user.levelWithdrawRequestAmount;
 
     await new WithdrawRequest({
