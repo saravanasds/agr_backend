@@ -50,7 +50,7 @@ const levelIncomeWithdrawRequest = async (req, res) => {
     }).save();
 
     await user.save();
-    
+
     return res.status(200).json({
       success: true,
       message: "Request submitted successfully...",
@@ -137,7 +137,7 @@ const userData = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "user not found" });
     }
-    user.levelWithdrawableAmount = user.levelValue - user.totalLevelWithdrawAmount + user.levelWithdrawRequestAmount;
+    user.levelWithdrawableAmount = user.levelValue - user.totalLevelWithdrawAmount - user.levelWithdrawRequestAmount;
 
     return res.status(200).json({ data: user });
   } catch (error) {
