@@ -321,14 +321,14 @@ const notification = async (req, res) => {
 
 const assignBonus = async (req, res) => {
   try {
-    const {referralId, bonusValue, subject, date} = req.body;
+    const {name, bankAcno, transactionNo, referralId, bonusValue, subject, date} = req.body;
     
     const user = await User.findOne({referralId});
 
     if(!user){
       return res.status(400).json({message : "user not found"})
     }
-    if(!referralId || !bonusValue || !subject || !date){
+    if(!name || !referralId || !bankAcno || !transactionNo || !bonusValue || !subject || !date){
       return res.status(400).json({message : "All fields are required"});
     }
     const withHistory = new WithdrawHistory({});
@@ -336,9 +336,9 @@ const assignBonus = async (req, res) => {
     user.bonusAmount = bonusValue;
     user.totalBonusAmount += bonusValue;
     user.amount += bonusValue; 
-    user.withdrawHistory.push({email : user.email, referralId, bonusValue, subject, date});
+    user.withdrawHistory.push({email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo});
     withHistory.withdrawHistory.push({
-      email : user.email, referralId, bonusValue, subject, date
+      email : user.email, name, referralId, bonusValue, subject, date, bankAcno, transactionNo
     })
     await withHistory.save();
     await user.save();
