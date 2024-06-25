@@ -261,7 +261,7 @@ const register = async (req, res) => {
     await sendEmail(user.email, "Account Activation", htmlContent);
 
     return res.status(200).json({
-      message: "Activation link sent to your email",
+      message: "Your form successfully submitted to admin side, wait untill your activation from admin side, It will be take within 24 hours, after you can login your account!",
       // activationToken: activationToken,
     });
   } catch (error) {
