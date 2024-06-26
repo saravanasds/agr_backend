@@ -19,7 +19,7 @@ import { protectRoute } from "../middleware/auth.js";
 // import aws from "aws-sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
-import { sendOtp, verifyOtp } from "../controllers/otpcontrol.js";
+// import { sendOtp, verifyOtp } from "../controllers/otpcontrol.js";
 
 import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
 // import dns from "dns";
@@ -111,7 +111,7 @@ router.post(
 );
 router.post("/notification", notification);
 router.post("/userData", protectRoute, userData);
-router.post("/sendOtp", sendOtp);
-router.post("/verifyOTP", verifyOtp);
+// router.post("/sendOtp", sendOtp);
+// router.post("/verifyOTP", verifyOtp);
 
 export const authRouter = router;
