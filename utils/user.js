@@ -1,21 +1,33 @@
 import { User } from "../models/user.js";
 
 export function getUserByEmail(request) {
-  return User.findOne({
-    email: request.body.email,
-  });
+  const email = request.body.email;
+  if (email) {
+    return User.findOne({
+      email,
+    });
+  }
+  return null;
 }
 
 export function getUserByActivationToken(request) {
-  return User.findOne({
-    activationToken: request.body.activationToken,
-  });
+  const activationToken = request.body.activationToken;
+  if (activationToken) {
+    return User.findOne({
+      activationToken,
+    });
+  }
+  return null;
 }
 
 export function getUserByRandomString(request) {
-  return User.findOne({
-    randomString: request.params.randomString,
-  });
+  const randomString = request.params.randomString;
+  if (randomString) {
+    return User.findOne({
+      randomString,
+    });
+  }
+  return null;
 }
 
 export function generateReferralId() {
@@ -32,5 +44,5 @@ export function generateReferralId() {
 
 export function getUsersOrderedByLevel() {
   // return User.find({ level: 1 }).sort({ level: 1 }); // 1 for ascending order
-  return User.find({ level: 1});
+  return User.find({ level: 1 });
 }

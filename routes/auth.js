@@ -97,7 +97,7 @@ router.post("/activate", activateUserEmail);
 router.post("/login", login);
 router.post("/forgotpassword", forgotPassword);
 router.get("/verifyRandomString/:randomString", verifyRandomString);
-router.put("/resetpassword/:randomString", resetpassword);
+router.post("/resetpassword/:randomString", resetpassword);
 router.get("/private", protectRoute, getPrivateData);
 router.post(
   "/levelIncomeWithdrawRequest",
