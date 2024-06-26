@@ -40,7 +40,7 @@ const userExist = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    // console.log(req.files)
+    console.log(req.files)
 
     let user = await getUserByEmail(req);
     if (user) {
@@ -92,9 +92,9 @@ const register = async (req, res) => {
       level: 1,
       password: hashedPassword,
       activationToken,
-      adharProof: req.files.adharProof[0].path,
-      photo: req.files.photo[0].path,
-      paymentScreenshot: req.files.paymentScreenshot[0].path,
+      adharProof: req.files.adharProof[0].location,
+      photo: req.files.photo[0].location,
+      paymentScreenshot: req.files.paymentScreenshot[0].location,
       referralId,
       referredBy,
     });
@@ -124,7 +124,7 @@ const register = async (req, res) => {
 
         if (userData.child.length === 3) {
           userData.level = 2;
-          userData.levelValue = 1500;
+        userData.levelValue = 1500;
 
         }
 
@@ -258,10 +258,10 @@ const register = async (req, res) => {
         </a>
         `;
 
-    await sendEmail(user.email, "Account Activation", htmlContent);
+    // await sendEmail(user.email, "Account Activation", htmlContent);
 
     return res.status(200).json({
-      message: "Your form successfully submitted to admin side, wait untill your activation from admin side, It will be take within 24 hours, after you can login your account!",
+      message: "Activation link sent to your email",
       // activationToken: activationToken,
     });
   } catch (error) {
@@ -319,7 +319,7 @@ const login = async (req, res) => {
     const token = sendToken(user);
     // const userName = user.firstName;
     // Respond with a success message and the token
-    res.status(200).json({ message: "Login successful", token, data: user });
+    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server" });
