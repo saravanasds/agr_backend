@@ -1,9 +1,20 @@
 import { User } from "../models/user.js";
+import { UserRegister } from "../models/userRegister.js";
 
 export function getUserByEmail(request) {
   const email = request.body.email;
   if (email) {
     return User.findOne({
+      email,
+    });
+  }
+  return null;
+}
+
+export function getUserRegisterByEmail(request) {
+  const email = request.body.email;
+  if (email) {
+    return UserRegister.findOne({
       email,
     });
   }

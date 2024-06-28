@@ -14,6 +14,8 @@ import {
   assignBonus,
   bonusHistory,
   referralHistory,
+  approveUser,
+  registeredUsers
   // levelIncomeHistory
 } from "../controllers/admin.js";
 import { protectRoute } from "../middleware/auth.js";
@@ -21,6 +23,7 @@ import { protectRoute } from "../middleware/auth.js";
 const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
+router.post("/approveUser",protectRoute, approveUser);
 router.post("/activateUser", protectRoute, activateUser);
 router.post("/deleteUser",protectRoute, deleteUser);
 router.post("/activatedUser",protectRoute, activatedUser);
@@ -33,6 +36,7 @@ router.post("/notification", protectRoute, notification);
 router.post("/assignBonus", protectRoute, assignBonus);
 router.get("/bonusHistory", protectRoute, bonusHistory);
 router.get("/referralHistory", protectRoute, referralHistory);
+router.post("/registeredUsers", protectRoute, registeredUsers);
 // router.get("/levelIncomeHistory", protectRoute, levelIncomeHistory);
 
 export const adminRouter = router;
