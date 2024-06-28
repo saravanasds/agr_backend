@@ -15,7 +15,8 @@ import {
   bonusHistory,
   referralHistory,
   approveUser,
-  registeredUsers
+  registeredUsers,
+  deleteUserRegister
   // levelIncomeHistory
 } from "../controllers/admin.js";
 import { protectRoute } from "../middleware/auth.js";
@@ -37,6 +38,7 @@ router.post("/assignBonus", protectRoute, assignBonus);
 router.get("/bonusHistory", protectRoute, bonusHistory);
 router.get("/referralHistory", protectRoute, referralHistory);
 router.post("/registeredUsers", protectRoute, registeredUsers);
+router.post("/deleteUserRegister", protectRoute, deleteUserRegister);
 // router.get("/levelIncomeHistory", protectRoute, levelIncomeHistory);
 
 export const adminRouter = router;

@@ -11,6 +11,7 @@ import { WithdrawHistory } from "../models/withdrawHistory.js";
 import { Bonus } from "../models/bonus.js";
 import { uniqId } from "../utils/uniqId.js";
 import { UserRegister } from "../models/userRegister.js";
+import { TrashUserRegister } from "../models/trash.js";
 
 const register = async (req, res) => {
   try {
@@ -80,12 +81,12 @@ const login = async (req, res) => {
 
 const approveUser = async (req, res) => {
   try {
-    console.log("approveUser : ",req.body)
+    // console.log("approveUser : ",req.body)
     let userRegister = await getUserRegisterByEmail(req);
     let user = await getUserByEmail(req);
 
-    if(user){
-      return res.status(400).json({error : "This user aldready exist"})
+    if (user) {
+      return res.status(400).json({ error: "This user aldready exist" });
     }
     if (!userRegister) {
       return res.status(400).json({ error: "User not found" });
@@ -95,38 +96,38 @@ const approveUser = async (req, res) => {
     const referralId = await uniqId();
 
     let allParent = [];
-    
+
     const newData = {
-      firstName : userRegister.firstName,
+      firstName: userRegister.firstName,
       referralId,
-      email : userRegister.email,
-      password : userRegister.password,
-      guardian : userRegister.guardian,
-      gender : userRegister.gender,
-      dob : userRegister.dob,
-      address : userRegister.address,
-      mobileNumber : userRegister.mobileNumber,
-      alternateMobileNumber : userRegister.alternateMobileNumber,
-      aadharNo : userRegister.aadharNo,
-      adharProof : userRegister.adharProof,
-      photo : userRegister.photo,
-      paymentScreenshot : userRegister.paymentScreenshot,
-      nomineeName : userRegister.nomineeName,
-      nomineeRelationship : userRegister.nomineeRelationship,
-      bankAcno : userRegister.bankAcno,
-      bankName : userRegister.bankName,
-      branch : userRegister.branch,
-      ifsc : userRegister.ifsc,
-      upiId : userRegister.upiId,
-      paymentDate : userRegister.paymentDate,
-      transactionId : userRegister.transactionId,
-      referredBy : userRegister.referredBy,
-      role : userRegister.role,
-      level : userRegister.level,
+      email: userRegister.email,
+      password: userRegister.password,
+      guardian: userRegister.guardian,
+      gender: userRegister.gender,
+      dob: userRegister.dob,
+      address: userRegister.address,
+      mobileNumber: userRegister.mobileNumber,
+      alternateMobileNumber: userRegister.alternateMobileNumber,
+      aadharNo: userRegister.aadharNo,
+      adharProof: userRegister.adharProof,
+      photo: userRegister.photo,
+      paymentScreenshot: userRegister.paymentScreenshot,
+      nomineeName: userRegister.nomineeName,
+      nomineeRelationship: userRegister.nomineeRelationship,
+      bankAcno: userRegister.bankAcno,
+      bankName: userRegister.bankName,
+      branch: userRegister.branch,
+      ifsc: userRegister.ifsc,
+      upiId: userRegister.upiId,
+      paymentDate: userRegister.paymentDate,
+      transactionId: userRegister.transactionId,
+      referredBy: userRegister.referredBy,
+      role: userRegister.role,
+      level: userRegister.level,
     };
 
     user = new User(newData);
-    console.log("newData : ",newData)
+    // console.log("newData : ", newData);
     // **************************************************
 
     let currentParentReferralId = "";
@@ -271,15 +272,22 @@ const approveUser = async (req, res) => {
 
       await userData.save();
     }
-    console.log("last line")
+
+    let userRegisterObj = userRegister.toObject();
+    delete userRegisterObj._id;
+    console.log(userRegisterObj);
+    let trashUserRegister = new TrashUserRegister(userRegisterObj);
+    await trashUserRegister.save();
+
+    await UserRegister.deleteOne({ _id: userRegister._id });
+
     return res.status(200).json({
-      message:
-        "Account approved successfully...",
+      message: "Account approved successfully...",
     });
 
     // **************************************************
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -610,6 +618,22 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const deleteUserRegister = async (req, res) => {
+  try {
+    const response = await UserRegister.deleteOne({
+      email: req.body.email,
+    });
+    if (response?.deletedCount === 0) {
+      return res
+        .status(400)
+        .send({ message: "User not found please check email..." });
+    }
+    return res.status(200).json({ message: "user deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
 export {
   register,
   login,
@@ -626,5 +650,6 @@ export {
   bonusHistory,
   referralHistory,
   registeredUsers,
-  approveUser
+  approveUser,
+  deleteUserRegister
 };
