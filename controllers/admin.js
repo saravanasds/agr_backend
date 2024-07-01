@@ -118,7 +118,7 @@ const approveUser = async (req, res) => {
       bankName: userRegister.bankName,
       branch: userRegister.branch,
       ifsc: userRegister.ifsc,
-      upiId: userRegister.upiId,
+      gpayNumber: userRegister.gpayNumber,
       paymentDate: userRegister.paymentDate,
       transactionId: userRegister.transactionId,
       referredBy: userRegister.referredBy,
